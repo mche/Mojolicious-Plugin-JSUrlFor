@@ -155,10 +155,12 @@ Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes for angular javascri
   perl script/app.pl generate js_url_for_angular > static/url_for.js
   
 
-
 In output file:
+
   удалить ненужные маршруты remove not needs routes
+  
   удалить двойные кавычки remove double quote in routes variable
+  
   заменить квадратные скобки массива в фигурные replace array routes squere parentesis to object 
 
 
