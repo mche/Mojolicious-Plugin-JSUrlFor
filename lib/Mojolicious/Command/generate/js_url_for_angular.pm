@@ -21,7 +21,7 @@ sub run {
     binmode(STDOUT, ":utf8");
     #~ die $self->usage unless $filename;
 
-    $self->app->plugin('Mojolicious::Plugin::JSUrlFor');
+    $self->app->plugin('Mojolicious::Plugin::JSUrlFor::Angular');
     my $js = $self->app->_js_url_for_code_only;
     say $js;
 

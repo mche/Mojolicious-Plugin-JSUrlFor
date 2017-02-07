@@ -58,6 +58,9 @@ sub register {
 
             #~ my $json_routes = $c->render_to_string( json => \%names2paths );
             my $json_routes = $json->encode(\@names2paths);
+            $json_routes =~ s/"//g;
+            $json_routes =~ s/\[/{/g;
+            $json_routes =~ s/\]/}/g;
             #~ utf8::decode( $json_routes );
 
             my $js = <<"JS";
