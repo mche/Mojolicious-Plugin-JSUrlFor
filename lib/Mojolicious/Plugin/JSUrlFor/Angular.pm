@@ -142,6 +142,8 @@ sub _get_path_for_route {
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes for angular javascript
