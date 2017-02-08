@@ -161,10 +161,6 @@ Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes for angular javascri
 In output file:
 
   удалить ненужные маршруты remove not needs routes
-  
-  удалить двойные кавычки remove double quote in routes variable
-  
-  заменить квадратные скобки массива в фигурные replace array routes squere parentesis to object 
 
 
 =head1 DESCRIPTION
@@ -173,7 +169,7 @@ In output file:
 
 =head1 HELPERS
 
-None
+None public
 
 =head1 CONFIG OPTIONS
 
