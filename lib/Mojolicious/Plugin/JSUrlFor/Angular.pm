@@ -154,8 +154,8 @@ Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes for angular javascri
 =head1 SYNOPSIS
 
   # Instead of helper use generator for generating static file
-  
-  perl script/app.pl generate js_url_for_angular > static/url_for.js
+  # cd <your/app/dir>
+  perl script/app.pl generate js_url_for_angular > public/js/url_for.js
   
 
 In output file:
