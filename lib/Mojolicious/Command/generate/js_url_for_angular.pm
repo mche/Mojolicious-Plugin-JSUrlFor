@@ -22,6 +22,7 @@ sub run {
     #~ die $self->usage unless $filename;
 
     $self->app->plugin('Mojolicious::Plugin::JSUrlFor::Angular');
+    #~ $self->app->startup();
     my $js = $self->app->_js_url_for_code_only;
     say $js;
 

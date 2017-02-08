@@ -19,17 +19,23 @@ sub register {
             my @names2paths;
             foreach my $route (@$endpoint_routes) {
                 next unless $route->name;
-
+                
                 my $path = $self->_get_path_for_route($route);
                 $path =~ s{^/*}{/}g; # TODO remove this quickfix
 
                 #~ $names2paths{$route->name} = $path;
                 push @names2paths, sprintf("'%s': '%s'", $route->name, $path);
+                
+                #~ if ($route->name eq 'assetpack by topic') {
+                    #~ push @names2paths, sprintf("'%s': '%s'", "t/$_", $app->url_for('assetpack by topic', topic=>$_))
+                      #~ for keys %{$app->assetpack->{by_topic}};
+                #~ }
             }
 
             #~ my $json_routes = $c->render_to_string( json => \%names2paths );
             my $json_routes = $json->encode(\@names2paths);
             $json_routes =~ s/"//g;
+            $json_routes =~ s/'/"/g;
             $json_routes =~ s/\[/{/g;
             $json_routes =~ s/\]/}/g;
             #~ utf8::decode( $json_routes );
@@ -39,6 +45,26 @@ sub register {
 'use strict';
 /*
 Маршрутизатор
+
+  appRoutes.url_for('foo name', {id: 123}); // передача объекта подстановки
+  appRoutes.url_for('foo name', [123]); // передача массива подстановки
+  appRoutes.url_for('foo name', 123); // передача скаляра подстановки
+  
+  tests
+  var routes = {
+    'foo bar': 'foo=:foo/bar=:bar',
+    ...
+  };
+  
+  console.log(appRoutes.url_for('foo bar', [])); //  foo=/bar=
+  console.log(appRoutes.url_for('foo bar', [1,2])); // foo=1/bar=2
+  console.log(appRoutes.url_for('foo bar', [1])); // foo=1/bar=
+  console.log(appRoutes.url_for('foo bar')); // foo=/bar=
+  console.log(appRoutes.url_for('foo bar', {})); // foo=/bar=
+  console.log(appRoutes.url_for('foo bar', {foo:'ok', baz:'0'})); // foo=ok/bar=
+  console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'})); // foo=ok/bar=0
+  console.log(appRoutes.url_for('foo bar', 'ook'); // foo=ook/bar=
+
 */
   
 var moduleName = "appRoutes";
@@ -47,22 +73,28 @@ try {
   if (angular.module(moduleName)) return function () {};
 } catch(err) { /* failed to require */ }
 
-var routes = $json_routes;
+var routes = $json_routes
+  , arr_re = new RegExp('[:*]\\\\w+', 'g');
+
 function url_for(route_name, captures) {
-    var pattern = routes[route_name];
-    if(!pattern) return route_name;
-
-    // Fill placeholders with values
-    if (!captures) captures = {};
-    for (var placeholder in captures) { // TODO order placeholders from longest to shortest
-        var re = new RegExp('[:*]' + placeholder, 'g');
-        pattern = pattern.replace(re, captures[placeholder]);
-    }
-
-    // Clean not replaces placeholders
-    pattern = pattern.replace(/[:*][^/.]+/g, '');
-
-    return pattern;
+  var pattern = routes[route_name];
+  if(!pattern) {
+    console.log("[appRoutes] Has none route for the name: "+route_name);
+    return route_name;
+  }
+  
+  if ( captures == undefined ) captures = [];
+  if (!angular.isObject(captures)) captures = [captures];
+  if(angular.isArray(captures)) {
+    var replacer = function () {var c =  captures.shift(); if(c == undefined) c=''; return c;}; //function (match, offset, string)
+    return pattern.replace(arr_re, replacer);
+  }
+  angular.forEach(captures, function(value, placeholder) {
+    var re = new RegExp('[:*]' + placeholder, 'g');
+    pattern = pattern.replace(re, value);
+  });
+  // Clean not replaces placeholders
+  return pattern.replace(/[:*][^/.]+/g, '');
 }
 
 var factory = {
