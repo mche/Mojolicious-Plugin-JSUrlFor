@@ -6,38 +6,9 @@ my $json = JSON::PP->new->utf8(0)->pretty;
 
 our $VERSION = '0.17';
 
-#~ use Mojo::ByteStream qw/b/;
-#~ use Data::Dumper;
-#~ use v5.10;
 
 sub register {
     my ( $self, $app, $config ) = @_;
-
-    #~ if ( $config->{route} ) {
-        #~ $app->routes->get( $config->{route} => sub {
-            #~ my $c = shift;
-            #~ $c->render(
-                #~ inline => $c->app->_js_url_for_code_only(),
-                #~ format => 'js'
-            #~ );
-        #~ } )->name('js_url_for');
-    #~ }
-
-    #~ $app->helper(
-        #~ js_url_for => sub {
-            #~ my $c      = shift;
-            #~ state $b_js; # bytestream for $js
-
-            #~ if ( $b_js && $app->mode eq 'production' ) {
-                #~ return $b_js;
-            #~ }
-
-            #~ my $js = $app->_js_url_for_code_only;
-
-            #~ $b_js = b('<script type="text/javascript">'.$js.'</script>');
-            #~ return $b_js;
-        #~ }
-    #~ );
 
     $app->helper(
         _js_url_for_code_only => sub {
@@ -108,8 +79,9 @@ angular.module(moduleName, [])
 .factory(moduleName, function () {
   return factory;
 })
-
 ;
+
+}());
 JS
             return $js;
         } );
@@ -149,7 +121,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes for angular javascript
+Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes as Angular javascript module. Mained on L<Mojolicious::Plugin::JSUrlFor>
 
 =head1 SYNOPSIS
 
@@ -160,7 +132,9 @@ Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes for angular javascri
 
 In output file:
 
-  удалить ненужные маршруты remove not needs routes
+  удалить ненужные маршруты
+  
+  remove not needs routes
 
 
 =head1 DESCRIPTION
@@ -177,7 +151,7 @@ None
 
 =head1 GENERATORS
 
-=head2 C<js_url_for_angular>
+=head2 js_url_for_angular
 
   perl script/app.pl generate js_url_for_angular > path/to/relative_file_name
 
@@ -195,7 +169,7 @@ Register plugin in L<Mojolicious> application.
 
 =head1 AUTHOR
 
-Viktor Turskyi <koorchik@cpan.org>
+Михаил Че (Mikhail Che) <mche[-at-]cpan.org>
 
 =head1 BUGS
 
@@ -205,6 +179,12 @@ Also you can report bugs to CPAN RT
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+L<Mojolicious::Plugin::JSUrlFor>
+
+L<Mojolicious>
+
+L<Mojolicious::Guides>
+
+L<http://mojolicio.us>
 
 =cut
