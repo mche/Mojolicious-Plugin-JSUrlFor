@@ -153,20 +153,20 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes as Angular javascript module. Mained on L<Mojolicious::Plugin::JSUrlFor>
+Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes as Angular javascript module. Mainified on L<Mojolicious::Plugin::JSUrlFor>
 
 =head1 SYNOPSIS
 
-  # Instead of helper use generator for generating static file
+  # Instead of helper only use generator for produce static file
   # cd <your/app/dir>
   perl script/app.pl generate js_url_for_angular > public/js/url_for.js
+  # In output file remove nonsecure routes
   
-
-In output file:
-
-  удалить ненужные маршруты
-  
-  remove not needs routes
+  # in javascript
+  angular.module(moduleName, ['appRoutes', ...])
+  .controller('fooControll', function (appRoutes) {
+    var url = appRoutes.url_for(...); // see help inside generated js file
+  });
 
 
 =head1 DESCRIPTION
@@ -179,7 +179,7 @@ None public
 
 =head1 CONFIG OPTIONS
 
-None
+None options
 
 =head1 GENERATORS
 
