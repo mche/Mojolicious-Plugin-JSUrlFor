@@ -70,7 +70,7 @@ sub register {
 Маршрутизатор
 */
   
-var moduleName = "Routes";
+var moduleName = "appRoutes";
 
 try {
   if (angular.module(moduleName)) return function () {};
