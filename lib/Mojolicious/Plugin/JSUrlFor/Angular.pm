@@ -44,26 +44,30 @@ sub register {
 (function () {
 'use strict';
 /*
-Маршрутизатор
-
+Маршруты/Routes
+  
+  appRoutes.url_for(route_name, captures, param)
+    returns url string
+    captures: either object, either array, either scalar
+    param: either object, either scalar
+  
   appRoutes.url_for('foo name', {id: 123}); // передача объекта подстановки
   appRoutes.url_for('foo name', [123]); // передача массива подстановки
   appRoutes.url_for('foo name', 123); // передача скаляра подстановки
+  appRoutes.url_for('foo name', ..., param); // передача параметров запроса (объект или готовая строка)
   
-  tests
-  var routes = {
-    'foo bar': 'foo=:foo/bar=:bar',
-    ...
-  };
-  
-  console.log(appRoutes.url_for('foo bar', [])); //  foo=/bar=
-  console.log(appRoutes.url_for('foo bar', [1,2])); // foo=1/bar=2
-  console.log(appRoutes.url_for('foo bar', [1])); // foo=1/bar=
-  console.log(appRoutes.url_for('foo bar')); // foo=/bar=
-  console.log(appRoutes.url_for('foo bar', {})); // foo=/bar=
-  console.log(appRoutes.url_for('foo bar', {foo:'ok', baz:'0'})); // foo=ok/bar=
-  console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'})); // foo=ok/bar=0
-  console.log(appRoutes.url_for('foo bar', 'ook'); // foo=ook/bar=
+  //tests
+  appRoutes.routes['foo bar'] = 'foo=:foo/bar=:bar';
+  console.log(appRoutes.url_for('foo bar', []) == 'foo=/bar=');
+  console.log(appRoutes.url_for('foo bar', [1,2]) == 'foo=1/bar=2');
+  console.log(appRoutes.url_for('foo bar', [1]) == 'foo=1/bar='); 
+  console.log(appRoutes.url_for('foo bar') == 'foo=/bar=');
+  console.log(appRoutes.url_for('foo bar', {}) == 'foo=/bar='); 
+  console.log(appRoutes.url_for('foo bar', {foo:'ok', baz:'0'}) == 'foo=ok/bar=');
+  console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'}) == 'foo=ok/bar=0' );
+  console.log(appRoutes.url_for('foo bar', 'ook') == 'foo=ook/bar=');
+  console.log(appRoutes.url_for('foo bar', null, 'param1') == 'foo=/bar=?param1');
+  console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'}, {p1:1,p2:2}) == 'foo=ok/bar=0?p1=1&p2=2' );
 
 */
   
@@ -76,7 +80,7 @@ try {
 var routes = $json_routes
   , arr_re = new RegExp('[:*]\\\\w+', 'g');
 
-function url_for(route_name, captures) {
+function url_for(route_name, captures, param) {
   var pattern = routes[route_name];
   if(!pattern) {
     console.log("[appRoutes] Has none route for the name: "+route_name);
@@ -84,17 +88,31 @@ function url_for(route_name, captures) {
   }
   
   if ( captures == undefined ) captures = [];
-  if (!angular.isObject(captures)) captures = [captures];
-  if(angular.isArray(captures)) {
-    var replacer = function () {var c =  captures.shift(); if(c == undefined) c=''; return c;}; //function (match, offset, string)
-    return pattern.replace(arr_re, replacer);
+  if ( !angular.isObject(captures) ) captures = [captures];
+  if ( angular.isArray(captures) ) {
+    var replacer = function () {
+      var c =  captures.shift();
+      if(c == undefined) c='';
+      return c;
+    }; 
+    pattern = pattern.replace(arr_re, replacer);
+  } else {
+    angular.forEach(captures, function(value, placeholder) {
+      var re = new RegExp('[:*]' + placeholder, 'g');
+      pattern = pattern.replace(re, value);
+    });
+    pattern = pattern.replace(/[:*][^/.]+/g, ''); // Clean not replaces placeholders
   }
-  angular.forEach(captures, function(value, placeholder) {
-    var re = new RegExp('[:*]' + placeholder, 'g');
-    pattern = pattern.replace(re, value);
+  
+  if ( param == undefined ) return pattern;
+  if ( !angular.isObject(param) ) return pattern + '?' + param;
+  var query = [];
+  angular.forEach(param, function(value, name) {
+    if ( angular.isArray(value) ) { angular.forEach(value, function(val) {query.push(name+'='+val);}); }
+    else { query.push(name+'='+value); }
   });
-  // Clean not replaces placeholders
-  return pattern.replace(/[:*][^/.]+/g, '');
+  if (!query.length) return pattern;
+  return pattern + '?' + query.join('&');
 }
 
 var factory = {

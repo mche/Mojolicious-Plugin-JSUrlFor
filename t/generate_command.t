@@ -13,7 +13,7 @@ my $t = Test::Mojo->new(__PACKAGE__);
   my $stdout = command($t);
   #~ warn $stdout;
   like $stdout, qr/тестовый маршрут/, 'right route';
-  like $stdout, qr/function url_for\(route_name, captures\) \{/, 'right route';
+  like $stdout, qr/function url_for\(route_name, captures, param\) \{/, 'right route';
 
 
 sub command {
