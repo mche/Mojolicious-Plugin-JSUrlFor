@@ -68,6 +68,7 @@ sub register {
   console.log(appRoutes.url_for('foo bar', 'ook') == 'foo=ook/bar=');
   console.log(appRoutes.url_for('foo bar', null, 'param1') == 'foo=/bar=?param1');
   console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'}, {p1:1,p2:2}) == 'foo=ok/bar=0?p1=1&p2=2' );
+  console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'}, {p1:1,"парам2":[1,2]}) == 'foo=ok/bar=0?p1=1&парам2=2&парам2=2' );
 
 */
   
