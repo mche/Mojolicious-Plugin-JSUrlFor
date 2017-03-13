@@ -4,7 +4,7 @@ use JSON::PP;
 
 my $json = JSON::PP->new->utf8(0)->pretty;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 
 sub register {
@@ -46,6 +46,7 @@ sub register {
 /*
 Маршруты/Routes
   
+  // method url_for
   appRoutes.url_for(route_name, captures, param)
     returns url string
     captures: either object, either array, either scalar
@@ -56,7 +57,7 @@ sub register {
   appRoutes.url_for('foo name', 123); // передача скаляра подстановки
   appRoutes.url_for('foo name', ..., param); // передача параметров запроса (объект или готовая строка)
   
-  //tests
+  // url_for tests
   appRoutes.routes['foo bar'] = 'foo=:foo/bar=:bar';
   console.log(appRoutes.url_for('foo bar', []) == 'foo=/bar=');
   console.log(appRoutes.url_for('foo bar', [1,2]) == 'foo=1/bar=2');
@@ -69,6 +70,10 @@ sub register {
   console.log(appRoutes.url_for('foo bar', null, 'param1') == 'foo=/bar=?param1');
   console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'}, {p1:1,p2:2}) == 'foo=ok/bar=0?p1=1&p2=2' );
   console.log(appRoutes.url_for('foo bar', {foo:'ok', bar:'0'}, {p1:1,"парам2":[1,2]}) == 'foo=ok/bar=0?p1=1&парам2=2&парам2=2' );
+  
+  // method baseURL
+  var base = appRoutes.baseURL();
+  appRoutes.baseURL('http://host...');
 
 */
   
@@ -79,13 +84,22 @@ try {
 } catch(err) { /* failed to require */ }
 
 var routes = $json_routes
-  , arr_re = new RegExp('[:*]\\\\w+', 'g');
+  , arr_re = new RegExp('[:*]\\\\w+', 'g')
+  , _baseURL = '';
+
+function baseURL (base) {// set/get base URL prefix
+  if (base == undefined) return _baseURL;
+  _baseURL = base;
+  return base;
+  
+}
+
 
 function url_for(route_name, captures, param) {
   var pattern = routes[route_name];
   if(!pattern) {
-    console.log("[appRoutes] Has none route for the name: "+route_name);
-    return route_name;
+    console.log("[angular.appRoutes] Has none route for the name: "+route_name);
+    return baseURL() + route_name;
   }
   
   if ( captures == undefined ) captures = [];
@@ -105,19 +119,20 @@ function url_for(route_name, captures, param) {
     pattern = pattern.replace(/[:*][^/.]+/g, ''); // Clean not replaces placeholders
   }
   
-  if ( param == undefined ) return pattern;
-  if ( !angular.isObject(param) ) return pattern + '?' + param;
+  if ( param == undefined ) return baseURL() + pattern;
+  if ( !angular.isObject(param) ) return baseURL() + pattern + '?' + param;
   var query = [];
   angular.forEach(param, function(value, name) {
     if ( angular.isArray(value) ) { angular.forEach(value, function(val) {query.push(name+'='+val);}); }
     else { query.push(name+'='+value); }
   });
-  if (!query.length) return pattern;
-  return pattern + '?' + query.join('&');
+  if (!query.length) return baseURL() + pattern;
+  return baseURL() + pattern + '?' + query.join('&');
 }
 
 var factory = {
   routes: routes,
+  baseURL: baseURL,
   url_for: url_for
 };
 
@@ -170,19 +185,32 @@ __END__
 
 =encoding utf8
 
+Доброго всем
+
+=head1 Mojolicious::Plugin::JSUrlFor::Angular
+
+¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+=head1 VERSION
+
+0.18
+
 =head1 NAME
 
-Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes as Angular javascript module. Mainified on L<Mojolicious::Plugin::JSUrlFor>
+Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes as Angular javascript module.
 
 =head1 SYNOPSIS
 
   # Instead of helper only use generator for produce static file
   # cd <your/app/dir>
   perl script/app.pl generate js_url_for_angular > public/js/url_for.js
-  # In output file remove nonsecure routes
+  # In output file inspect/remove nonsecure routes
   
   # in javascript
   angular.module(moduleName, ['appRoutes', ...])
+  .config(function(appRoutes) {
+    appRoutes.baseURL('https://foo.com');
+  })
   .controller('fooControll', function (appRoutes) {
     var url = appRoutes.url_for(...); // see help inside generated js file
   });
@@ -190,7 +218,7 @@ Mojolicious::Plugin::JSUrlFor::Angular - Mojolicious routes as Angular javascrip
 
 =head1 DESCRIPTION
 
-Генерация маршрутов для Angular1
+Генерация маршрутов для Angular1 Mojolicious routes genenerator for Angular1. Forked from L<Mojolicious::Plugin::JSUrlFor>.
 
 =head1 HELPERS
 
