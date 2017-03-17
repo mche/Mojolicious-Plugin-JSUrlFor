@@ -44,6 +44,9 @@ sub register {
 (function () {
 'use strict';
 /*
+
+¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
 Маршруты/Routes
   
   // method url_for
@@ -83,12 +86,12 @@ try {
   if (angular.module(moduleName)) return function () {};
 } catch(err) { /* failed to require */ }
 
-var routes = $json_routes
-  , arr_re = new RegExp('[:*]\\\\w+', 'g')
-  , _baseURL = '';
+var routes = $json_routes,
+  arr_re = new RegExp('[:*]\\\\w+', 'g'),
+  _baseURL = '';
 
 function baseURL (base) {// set/get base URL prefix
-  if (base == undefined) return _baseURL;
+  if (base === undefined) return _baseURL;
   _baseURL = base;
   return base;
   
@@ -102,12 +105,12 @@ function url_for(route_name, captures, param) {
     return baseURL() + route_name;
   }
   
-  if ( captures == undefined ) captures = [];
+  if ( captures === undefined ) captures = [];
   if ( !angular.isObject(captures) ) captures = [captures];
   if ( angular.isArray(captures) ) {
     var replacer = function () {
       var c =  captures.shift();
-      if(c == undefined) c='';
+      if ( c === undefined ) c='';
       return c;
     }; 
     pattern = pattern.replace(arr_re, replacer);
@@ -119,7 +122,7 @@ function url_for(route_name, captures, param) {
     pattern = pattern.replace(/[:*][^/.]+/g, ''); // Clean not replaces placeholders
   }
   
-  if ( param == undefined ) return baseURL() + pattern;
+  if ( param === undefined ) return baseURL() + pattern;
   if ( !angular.isObject(param) ) return baseURL() + pattern + '?' + param;
   var query = [];
   angular.forEach(param, function(value, name) {
